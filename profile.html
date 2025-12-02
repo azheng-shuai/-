@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>个人中心 - 城院二手市场</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <div class="logo-icon">城</div>
+                    <h1>城院二手市场</h1>
+                </div>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 未登录状态个人信息 -->
+        <div class="user-profile" id="notLoggedInProfile">
+            <div class="profile-bg">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info-short">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h2>请登录账号</h2>
+                    <p>登录后可使用完整功能</p>
+                    <button class="login-btn" id="gotoLoginBtn">立即登录</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 已登录状态个人信息 -->
+        <div class="user-profile" id="loggedInProfile" style="display: none;">
+            <div class="profile-bg">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info-short">
+                <div class="user-avatar">V</div>
+                <div class="user-details">
+                    <h2>S.ZWS</h2>
+                    <p>计算机与计算科学学院 | 1686666xxxx</p>
+                    <p>求真楼xx栋</p>
+                </div>
+            </div>
+            
+            <div class="user-stats">
+                <div class="stat-item">
+                    <div class="stat-number">11451</div>
+                    <div class="stat-label">粉丝</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">886</div>
+                    <div class="stat-label">关注</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 功能菜单 -->
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showToast('我的收藏')">
+                <div class="menu-icon"><i class="fas fa-heart"></i></div>
+                <div class="menu-text">我的收藏</div>
+            </div>
+            <div class="menu-item" onclick="showToast('我的发布')">
+                <div class="menu-icon"><i class="fas fa-list"></i></div>
+                <div class="menu-text">我的发布</div>
+            </div>
+            <a href="cart.html" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="menu-text">购物车</div>
+            </a>
+            <div class="menu-item" onclick="showToast('个人信息')">
+                <div class="menu-icon"><i class="fas fa-edit"></i></div>
+                <div class="menu-text">个人信息</div>
+            </div>
+        </div>
+        
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showToast('买书订单')">
+                <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
+                <div class="menu-text">买书订单</div>
+            </div>
+            <div class="menu-item" onclick="showToast('卖书订单')">
+                <div class="menu-icon"><i class="fas fa-tag"></i></div>
+                <div class="menu-text">卖书订单</div>
+            </div>
+            <div class="menu-item" onclick="showToast('意见反馈')">
+                <div class="menu-icon"><i class="fas fa-comment-alt"></i></div>
+                <div class="menu-text">意见反馈</div>
+            </div>
+            <div class="menu-item" onclick="showToast('联系客服')">
+                <div class="menu-icon"><i class="fas fa-headset"></i></div>
+                <div class="menu-text">联系客服</div>
+            </div>
+        </div>
+        
+        <!-- 退出登录按钮（仅登录状态显示） -->
+        <div id="logoutContainer" style="display: none; margin: 15px 0;">
+            <div class="menu-item" id="logoutBtn" style="grid-column: span 4;">
+                <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                <div class="menu-text">退出登录</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录界面 -->
+    <div class="login-page" id="loginPage">
+        <div class="login-header">
+            <div></div>
+            <div class="login-title">账号登录</div>
+            <button class="close-login" id="closeLoginBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名/学号</label>
+                <input type="text" id="username" class="form-control" placeholder="请输入用户名或学号" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" class="form-control" placeholder="请输入密码" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">登录</button>
+            <button type="button" class="btn btn-outline" id="registerBtn">注册账号</button>
+            
+            <div class="form-footer">
+                <a href="#">忘记密码？</a>
+                <a href="#">校园网登录</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div>首页</div>
+        </a>
+        <a href="sell.html" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-tag"></i></div>
+            <div>卖书</div>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+            </div>
+            <div>购物车</div>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div>我的</div>
+        </a>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gotoLoginBtn = document.getElementById('gotoLoginBtn');
+            const loginPage = document.getElementById('loginPage');
+            const closeLoginBtn = document.getElementById('closeLoginBtn');
+            const loginForm = document.getElementById('loginForm');
+            const registerBtn = document.getElementById('registerBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // 跳转到登录页面
+            if (gotoLoginBtn) {
+                gotoLoginBtn.addEventListener('click', function() {
+                    loginPage.classList.add('active');
+                });
+            }
+            
+            // 关闭登录页面
+            if (closeLoginBtn) {
+                closeLoginBtn.addEventListener('click', function() {
+                    loginPage.classList.remove('active');
+                });
+            }
+            
+            // 登录表单提交
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // 简单验证
+                    if (username && password) {
+                        showToast('登录成功');
+                        setTimeout(() => {
+                            loginPage.classList.remove('active');
+                            localStorage.setItem('isLoggedIn', 'true');
+                            updateLoginState();
+                            // 清空表单
+                            loginForm.reset();
+                        }, 1000);
+                    } else {
+                        showToast('请输入用户名和密码');
+                    }
+                });
+            }
+            
+            // 注册按钮
+            if (registerBtn) {
+                registerBtn.addEventListener('click', function() {
+                    showToast('注册功能开发中');
+                });
+            }
+            
+            // 退出登录
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.setItem('isLoggedIn', 'false');
+                    localStorage.removeItem('cart'); // 清空购物车
+                    updateLoginState();
+                    showToast('已退出登录');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

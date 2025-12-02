@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>购物车 - 城院二手市场</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <button class="back-btn" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="title">购物车</div>
+                <button class="back-btn" style="visibility: hidden;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="cart-header">
+            <div>已选商品 (<span id="cartCount">0</span>)</div>
+            <div class="edit-btn" id="editBtn">编辑</div>
+        </div>
+        
+        <div id="cartItems">
+            <!-- 购物车商品将通过JavaScript动态生成 -->
+        </div>
+        
+        <!-- 收货地址选择 -->
+        <div class="address-section" id="addressSection">
+            <div class="section-title">
+                <span>收货地址</span>
+                <span class="address-select-btn" id="selectAddressBtn">选择地址</span>
+            </div>
+            <div class="address-info" id="addressInfo">
+                <div class="no-address" id="noAddress">请选择收货地址</div>
+                <div class="selected-address" id="selectedAddress" style="display: none;">
+                    <div class="address-user">
+                        <span id="addressUserName">张三</span>
+                        <span id="addressUserPhone">13800000000</span>
+                    </div>
+                    <div class="address-detail" id="addressDetail">浙江大学城市学院求真楼xx栋xxx室</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 配送方式 -->
+        <div class="delivery-section">
+            <div class="section-title">配送方式</div>
+            <div class="delivery-options">
+                <div class="delivery-option selected" data-type="self">
+                    <i class="fas fa-walking"></i>
+                    <span>自提</span>
+                    <div class="option-desc">到卖家指定地点自取</div>
+                    <div class="option-check"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="delivery-option" data-type="delivery">
+                    <i class="fas fa-motorcycle"></i>
+                    <span>配送</span>
+                    <div class="option-desc">卖家配送（需额外费用）</div>
+                    <div class="option-check"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 订单备注 -->
+        <div class="order-remark">
+            <div class="section-title">订单备注</div>
+            <textarea class="remark-input" id="orderRemark" placeholder="选填，可以填写您的特殊要求"></textarea>
+        </div>
+        
+        <!-- 价格明细 -->
+        <div class="price-detail">
+            <div class="price-item">
+                <span>商品总价</span>
+                <span>¥<span id="goodsTotal">0.00</span></span>
+            </div>
+            <div class="price-item">
+                <span>配送费</span>
+                <span>¥<span id="deliveryFee">0.00</span></span>
+            </div>
+            <div class="price-total">
+                <span>实付款</span>
+                <span class="total-price">¥<span id="finalTotal">0.00</span></span>
+            </div>
+        </div>
+        
+        <div class="cart-footer">
+            <div class="footer-left">
+                <div class="total-price">合计: ¥<span id="totalPrice">0.00</span></div>
+                <div class="price-desc">已优惠 ¥<span id="discountPrice">0.00</span></div>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">去结算</button>
+        </div>
+    </div>
+
+    <!-- 地址选择弹窗 -->
+    <div class="address-modal" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择收货地址</h3>
+                <button class="close-modal" onclick="closeAddressModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="address-list" id="addressList">
+                    <!-- 地址列表动态生成 -->
+                </div>
+                <button class="add-address-btn" onclick="addNewAddress()">
+                    <i class="fas fa-plus"></i> 添加新地址
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加地址弹窗 -->
+    <div class="add-address-modal" id="addAddressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加收货地址</h3>
+                <button class="close-modal" onclick="closeAddAddressModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newUserName">收货人</label>
+                    <input type="text" id="newUserName" class="form-control" placeholder="请输入收货人姓名">
+                </div>
+                <div class="form-group">
+                    <label for="newUserPhone">手机号码</label>
+                    <input type="tel" id="newUserPhone" class="form-control" placeholder="请输入手机号码">
+                </div>
+                <div class="form-group">
+                    <label for="newAddress">详细地址</label>
+                    <textarea id="newAddress" class="form-control" placeholder="请输入详细地址，如：求真楼xx栋xxx室"></textarea>
+                </div>
+                <button class="save-address-btn" onclick="saveNewAddress()">保存地址</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结算确认弹窗 -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>确认订单</h3>
+                <button class="close-modal" onclick="closeCheckoutModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="order-summary">
+                    <div class="summary-item">
+                        <span>商品总价</span>
+                        <span>¥<span id="modalGoodsTotal">0.00</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>配送费</span>
+                        <span>¥<span id="modalDeliveryFee">0.00</span></span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>实付款</span>
+                        <span class="total-price">¥<span id="modalFinalTotal">0.00</span></span>
+                    </div>
+                </div>
+                <div class="order-address">
+                    <div class="address-title">收货地址</div>
+                    <div class="address-content" id="modalAddress">
+                        请选择收货地址
+                    </div>
+                </div>
+                <div class="order-remark-display">
+                    <div class="remark-title">订单备注</div>
+                    <div class="remark-content" id="modalRemark">无</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="confirm-checkout-btn" onclick="confirmCheckout()">确认支付</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支付成功弹窗 -->
+    <div class="success-modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>支付成功！</h3>
+            <p>订单已提交，请等待卖家确认</p>
+            <div class="order-info">
+                <div class="info-item">
+                    <span>订单号：</span>
+                    <span id="orderNumber">CZ20231215001</span>
+                </div>
+                <div class="info-item">
+                    <span>支付金额：</span>
+                    <span class="price">¥<span id="successTotal">0.00</span></span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn" onclick="viewOrder()">查看订单</button>
+                <button class="action-btn primary" onclick="continueShopping()">继续购物</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div>首页</div>
+        </a>
+        <a href="sell.html" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-tag"></i></div>
+            <div>卖书</div>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+            </div>
+            <div>购物车</div>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div>我的</div>
+        </a>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // 购物车数据
+        let cartItems = [];
+        let isEditing = false;
+        let selectedAddress = null;
+        let selectedDelivery = 'self'; // self: 自提, delivery: 配送
+        let deliveryFee = 0;
+        
+        // 地址数据（模拟）
+        let addresses = [
+            { id: 1, name: "张三", phone: "13800000001", address: "浙江大学城市学院求真楼12栋305室", isDefault: true },
+            { id: 2, name: "张三", phone: "13800000001", address: "浙江大学城市学院问源楼8栋212室", isDefault: false },
+            { id: 3, name: "李四", phone: "13900000002", address: "浙江大学城市学院慕贤楼5栋106室", isDefault: false }
+        ];
+        
+        // 页面加载初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLoginState();
+            loadCart();
+            initAddress();
+            initDeliveryOptions();
+            initEvents();
+            
+            // 加载默认地址
+            loadDefaultAddress();
+        });
+        
+        // 加载购物车
+        function loadCart() {
+            cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            updateCartDisplay();
+            updatePrice();
+        }
+        
+        // 更新购物车显示
+        function updateCartDisplay() {
+            const cartItemsContainer = document.getElementById('cartItems');
+            const cartCountElement = document.getElementById('cartCount');
+            const editBtn = document.getElementById('editBtn');
+            
+            cartItemsContainer.innerHTML = '';
+            
+            if (cartItems.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="empty-cart">购物车为空</div>';
+                cartCountElement.textContent = '0';
+                editBtn.style.display = 'none';
+                document.getElementById('addressSection').style.display = 'none';
+                return;
+            }
+            
+            editBtn.style.display = 'block';
+            document.getElementById('addressSection').style.display = 'block';
+            
+            cartItems.forEach((item, index) => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <input type="checkbox" class="cart-checkbox" ${isEditing ? '' : 'checked'} data-index="${index}" onchange="updatePrice()">
+                    <div class="cart-item-image">
+                        <img src="${item.image}" alt="${item.title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjBGMEYwIi8+CjxwYXRoIGQ9Ik00MCA0MEM0My4zMTM3IDQwIDQ2IDM3LjMxMzcgNDYgMzRDNDYgMzAuNjg2MyA0My4zMTM3IDI4IDQwIDI4QzM2LjY4NjMgMjggMzQgMzAuNjg2MyAzNCAzNEMzNCAzNy4zMTM3IDM2LjY4NjMgNDAgNDAgNDBaTTQwIDQyQzM0LjQ3NzggNDIgMjYgNDQuMjM4OCAyNiA1MFY1Nkg1NFY1MEM1NCA0NC4yMzg4IDQ1LjUyMjIgNDIgNDAgNDJaIiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPgo='">
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.title}</div>
+                        <div class="cart-item-price">¥${item.price.toFixed(2)}</div>
+                        ${isEditing ? `<div class="item-quantity">
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                            <span class="quantity">${item.quantity || 1}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        </div>` : ''}
+                    </div>
+                    ${isEditing ? `<button class="remove-item" onclick="removeFromCart(${index})" title="删除">
+                        <i class="fas fa-trash"></i>
+                    </button>` : ''}
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+            
+            cartCountElement.textContent = cartItems.length;
+        }
+        
+        // 更新商品数量
+        function updateQuantity(index, change) {
+            if (!cartItems[index]) return;
+            
+            if (!cartItems[index].quantity) {
+                cartItems[index].quantity = 1;
+            }
+            
+            const newQuantity = cartItems[index].quantity + change;
+            
+            if (newQuantity < 1) {
+                removeFromCart(index);
+                return;
+            }
+            
+            cartItems[index].quantity = newQuantity;
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            updateCartDisplay();
+            updatePrice();
+        }
+        
+        // 从购物车移除商品
+        function removeFromCart(index) {
+            cartItems.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            updateCartDisplay();
+            updatePrice();
+            showToast('已从购物车移除');
+        }
+        
+        // 更新价格计算
+        function updatePrice() {
+            const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
+            let totalPrice = 0;
+            let discount = 0;
+            
+            checkboxes.forEach(checkbox => {
+                const index = parseInt(checkbox.getAttribute('data-index'));
+                if (cartItems[index]) {
+                    const quantity = cartItems[index].quantity || 1;
+                    totalPrice += cartItems[index].price * quantity;
+                }
+            });
+            
+            // 计算优惠（示例：满50减5）
+            if (totalPrice >= 50) {
+                discount = 5;
+            }
+            
+            // 计算配送费
+            deliveryFee = selectedDelivery === 'delivery' ? 5 : 0;
+            
+            const finalTotal = totalPrice - discount + deliveryFee;
+            
+            // 更新显示
+            document.getElementById('goodsTotal').textContent = totalPrice.toFixed(2);
+            document.getElementById('deliveryFee').textContent = deliveryFee.toFixed(2);
+            document.getElementById('finalTotal').textContent = finalTotal.toFixed(2);
+            document.getElementById('totalPrice').textContent = finalTotal.toFixed(2);
+            document.getElementById('discountPrice').textContent = discount.toFixed(2);
+        }
+        
+        // 初始化地址
+        function initAddress() {
+            selectedAddress = addresses.find(addr => addr.isDefault) || null;
+            updateAddressDisplay();
+        }
+        
+        // 加载默认地址
+        function loadDefaultAddress() {
+            const defaultAddress = addresses.find(addr => addr.isDefault);
+            if (defaultAddress) {
+                selectAddress(defaultAddress);
+            }
+        }
+        
+        // 更新地址显示
+        function updateAddressDisplay() {
+            const noAddress = document.getElementById('noAddress');
+            const selectedAddressDiv = document.getElementById('selectedAddress');
+            const addressUserName = document.getElementById('addressUserName');
+            const addressUserPhone = document.getElementById('addressUserPhone');
+            const addressDetail = document.getElementById('addressDetail');
+            
+            if (selectedAddress) {
+                noAddress.style.display = 'none';
+                selectedAddressDiv.style.display = 'block';
+                addressUserName.textContent = selectedAddress.name;
+                addressUserPhone.textContent = selectedAddress.phone;
+                addressDetail.textContent = selectedAddress.address;
+            } else {
+                noAddress.style.display = 'block';
+                selectedAddressDiv.style.display = 'none';
+            }
+        }
+        
+        // 选择地址
+        function selectAddress(address) {
+            selectedAddress = address;
+            updateAddressDisplay();
+            closeAddressModal();
+        }
+        
+        // 初始化配送选项
+        function initDeliveryOptions() {
+            const options = document.querySelectorAll('.delivery-option');
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除其他选项的选中状态
+                    options.forEach(opt => {
+                        opt.classList.remove('selected');
+                        opt.querySelector('.option-check i').style.display = 'none';
+                    });
+                    
+                    // 设置当前选项为选中状态
+                    this.classList.add('selected');
+                    this.querySelector('.option-check i').style.display = 'block';
+                    
+                    // 更新配送方式
+                    selectedDelivery = this.getAttribute('data-type');
+                    
+                    // 更新价格
+                    updatePrice();
+                });
+            });
+        }
+        
+        // 初始化事件
+        function initEvents() {
+            // 编辑按钮
+            const editBtn = document.getElementById('editBtn');
+            editBtn.addEventListener('click', function() {
+                isEditing = !isEditing;
+                this.textContent = isEditing ? '完成' : '编辑';
+                updateCartDisplay();
+            });
+            
+            // 选择地址按钮
+            const selectAddressBtn = document.getElementById('selectAddressBtn');
+            selectAddressBtn.addEventListener('click', openAddressModal);
+            
+            // 结算按钮
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.addEventListener('click', openCheckoutModal);
+        }
+        
+        // 打开地址选择弹窗
+        function openAddressModal() {
+            const addressList = document.getElementById('addressList');
+            addressList.innerHTML = '';
+            
+            addresses.forEach(address => {
+                const addressItem = document.createElement('div');
+                addressItem.className = 'address-item';
+                if (selectedAddress && selectedAddress.id === address.id) {
+                    addressItem.classList.add('selected');
+                }
+                addressItem.innerHTML = `
+                    <div class="address-item-main">
+                        <div class="address-item-user">
+                            <span>${address.name}</span>
+                            <span>${address.phone}</span>
+                        </div>
+                        <div class="address-item-detail">${address.address}</div>
+                    </div>
+                    <div class="address-item-actions">
+                        <div class="default-tag" style="display: ${address.isDefault ? 'block' : 'none'}">默认</div>
+                        <button class="select-address-btn" onclick="selectAddress(${JSON.stringify(address).replace(/"/g, '&quot;')})">选择</button>
+                    </div>
+                `;
+                addressList.appendChild(addressItem);
+            });
+            
+            document.getElementById('addressModal').classList.add('active');
+        }
+        
+        // 关闭地址选择弹窗
+        function closeAddressModal() {
+            document.getElementById('addressModal').classList.remove('active');
+        }
+        
+        // 添加新地址
+        function addNewAddress() {
+            closeAddressModal();
+            document.getElementById('addAddressModal').classList.add('active');
+        }
+        
+        // 关闭添加地址弹窗
+        function closeAddAddressModal() {
+            document.getElementById('addAddressModal').classList.remove('active');
+        }
+        
+        // 保存新地址
+        function saveNewAddress() {
+            const name = document.getElementById('newUserName').value.trim();
+            const phone = document.getElementById('newUserPhone').value.trim();
+            const address = document.getElementById('newAddress').value.trim();
+            
+            if (!name || !phone || !address) {
+                showToast('请填写完整信息');
+                return;
+            }
+            
+            // 简单手机号验证
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(phone)) {
+                showToast('请输入有效的手机号码');
+                return;
+            }
+            
+            const newAddress = {
+                id: addresses.length + 1,
+                name,
+                phone,
+                address,
+                isDefault: addresses.length === 0 // 如果是第一个地址，设为默认
+            };
+            
+            addresses.push(newAddress);
+            
+            // 清空表单
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserPhone').value = '';
+            document.getElementById('newAddress').value = '';
+            
+            closeAddAddressModal();
+            selectAddress(newAddress);
+            showToast('地址添加成功');
+        }
+        
+        // 打开结算确认弹窗
+        function openCheckoutModal() {
+            // 检查是否有选中的商品
+            const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
+            if (checkboxes.length === 0) {
+                showToast('请选择要结算的商品');
+                return;
+            }
+            
+            // 检查是否已登录
+            if (!checkLoginStatus()) {
+                showToast('请先登录');
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1000);
+                return;
+            }
+            
+            // 检查是否有地址
+            if (!selectedAddress) {
+                showToast('请选择收货地址');
+                openAddressModal();
+                return;
+            }
+            
+            // 更新弹窗中的信息
+            document.getElementById('modalGoodsTotal').textContent = document.getElementById('goodsTotal').textContent;
+            document.getElementById('modalDeliveryFee').textContent = document.getElementById('deliveryFee').textContent;
+            document.getElementById('modalFinalTotal').textContent = document.getElementById('finalTotal').textContent;
+            
+            // 更新地址显示
+            const modalAddress = document.getElementById('modalAddress');
+            if (selectedAddress) {
+                modalAddress.innerHTML = `
+                    <div class="modal-address-user">
+                        <span>${selectedAddress.name}</span>
+                        <span>${selectedAddress.phone}</span>
+                    </div>
+                    <div class="modal-address-detail">${selectedAddress.address}</div>
+                `;
+            }
+            
+            // 更新备注显示
+            const remark = document.getElementById('orderRemark').value.trim();
+            document.getElementById('modalRemark').textContent = remark || '无';
+            
+            // 显示弹窗
+            document.getElementById('checkoutModal').classList.add('active');
+        }
+        
+        // 关闭结算确认弹窗
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.remove('active');
+        }
+        
+        // 确认结算
+        function confirmCheckout() {
+            // 模拟支付过程
+            const checkoutBtn = document.querySelector('.confirm-checkout-btn');
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = '支付中...';
+            
+            setTimeout(() => {
+                // 生成订单号
+                const orderNumber = 'CZ' + new Date().getFullYear() + 
+                    ('0' + (new Date().getMonth() + 1)).slice(-2) + 
+                    ('0' + new Date().getDate()).slice(-2) + 
+                    ('00' + Math.floor(Math.random() * 1000)).slice(-3);
+                
+                // 获取订单信息
+                const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
+                const selectedItems = [];
+                
+                checkboxes.forEach(checkbox => {
+                    const index = parseInt(checkbox.getAttribute('data-index'));
+                    if (cartItems[index]) {
+                        selectedItems.push(cartItems[index]);
+                    }
+                });
+                
+                // 创建订单
+                const order = {
+                    id: orderNumber,
+                    items: selectedItems,
+                    address: selectedAddress,
+                    delivery: selectedDelivery,
+                    deliveryFee: deliveryFee,
+                    remark: document.getElementById('orderRemark').value.trim(),
+                    total: parseFloat(document.getElementById('finalTotal').textContent),
+                    status: 'pending', // pending, paid, shipped, completed, cancelled
+                    createTime: new Date().toISOString()
+                };
+                
+                // 保存订单到本地存储
+                let orders = JSON.parse(localStorage.getItem('orders')) || [];
+                orders.push(order);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                
+                // 从购物车中移除已结算的商品
+                const indicesToRemove = Array.from(checkboxes)
+                    .map(checkbox => parseInt(checkbox.getAttribute('data-index')))
+                    .sort((a, b) => b - a); // 从大到小排序，避免索引错位
+                
+                indicesToRemove.forEach(index => {
+                    cartItems.splice(index, 1);
+                });
+                
+                localStorage.setItem('cart', JSON.stringify(cartItems));
+                
+                // 显示成功弹窗
+                document.getElementById('checkoutModal').classList.remove('active');
+                document.getElementById('successModal').classList.add('active');
+                document.getElementById('orderNumber').textContent = orderNumber;
+                document.getElementById('successTotal').textContent = order.total.toFixed(2);
+                
+                // 重置结算按钮
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = '确认支付';
+                
+                // 更新购物车显示
+                updateCartDisplay();
+                updatePrice();
+                
+                showToast('支付成功！');
+            }, 1500);
+        }
+        
+        // 查看订单
+        function viewOrder() {
+            // 这里可以跳转到订单详情页，目前暂时提示
+            showToast('查看订单功能开发中');
+            closeSuccessModal();
+            // 在实际应用中，可以跳转到订单页面
+            // window.location.href = 'orders.html';
+        }
+        
+        // 继续购物
+        function continueShopping() {
+            closeSuccessModal();
+            window.location.href = 'index.html';
+        }
+        
+        // 关闭成功弹窗
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+        
+        // 点击弹窗外部关闭
+        document.getElementById('addressModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddressModal();
+            }
+        });
+        
+        document.getElementById('addAddressModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddAddressModal();
+            }
+        });
+        
+        document.getElementById('checkoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCheckoutModal();
+            }
+        });
+        
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuccessModal();
+            }
+        });
+    </script>
+</body>
+</html>
